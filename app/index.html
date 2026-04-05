@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRONVEIL DEFENSE — Strategic Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --black:#080A0C;
+  --deep:#0D1117;
+  --surface:#131920;
+  --card:#1A2330;
+  --border:#1E2D3D;
+  --accent:#C8A84B;
+  --accent2:#4B8FC8;
+  --red:#C84B4B;
+  --text:#D4D8DC;
+  --muted:#6B7A8A;
+  --mono:'Share Tech Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+  --cond:'Barlow Condensed',sans-serif;
+  --body:'Barlow',sans-serif;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--black);
+  color:var(--text);
+  font-family:var(--body);
+  overflow-x:hidden;
+  cursor:crosshair;
+}
+
+/* GRID OVERLAY */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(200,168,75,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,168,75,0.03) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* SCAN LINE */
+body::after{
+  content:'';
+  position:fixed;
+  top:-100%;
+  left:0;
+  width:100%;
+  height:2px;
+  background:linear-gradient(90deg,transparent,rgba(200,168,75,0.4),transparent);
+  animation:scan 8s linear infinite;
+  pointer-events:none;
+  z-index:999;
+}
+@keyframes scan{to{top:200%}}
+
+/* NAV */
+nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:100;
+  padding:0 4rem;
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:rgba(8,10,12,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+
+.nav-logo{
+  font-family:var(--display);
+  font-size:1.6rem;
+  letter-spacing:0.1em;
+  color:var(--accent);
+  text-decoration:none;
+}
+.nav-logo span{color:var(--text);opacity:0.5}
+
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{
+  font-family:var(--mono);
+  font-size:0.72rem;
+  letter-spacing:0.12em;
+  color:var(--muted);
+  text-decoration:none;
+  text-transform:uppercase;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--accent)}
+
+.nav-cta{
+  font-family:var(--mono);
+  font-size:0.72rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  padding:0.5rem 1.2rem;
+  border:1px solid var(--accent);
+  color:var(--accent);
+  text-decoration:none;
+  transition:all 0.2s;
+}
+.nav-cta:hover{background:var(--accent);color:var(--black)}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:8rem 4rem 4rem;
+  position:relative;
+  overflow:hidden;
+}
+
+.hero-badge{
+  font-family:var(--mono);
+  font-size:0.68rem;
+  letter-spacing:0.2em;
+  color:var(--accent);
+  text-transform:uppercase;
+  margin-bottom:2rem;
+  display:flex;
+  align-items:center;
+  gap:0.8rem;
+  opacity:0;
+  animation:fadeUp 0.8s 0.2s forwards;
+}
+.hero-badge::before{
+  content:'';
+  width:32px;height:1px;
+  background:var(--accent);
+}
+
+.hero h1{
+  font-family:var(--display);
+  font-size:clamp(4rem,10vw,9rem);
+  line-height:0.92;
+  letter-spacing:0.02em;
+  color:#fff;
+  max-width:900px;
+  opacity:0;
+  animation:fadeUp 0.8s 0.4s forwards;
+}
+.hero h1 em{
+  font-style:normal;
+  color:var(--accent);
+  -webkit-text-stroke:0px;
+}
+.hero h1 .outline{
+  -webkit-text-stroke:1px rgba(255,255,255,0.3);
+  color:transparent;
+}
+
+.hero-sub{
+  font-family:var(--body);
+  font-size:1.05rem;
+  font-weight:300;
+  color:var(--muted);
+  max-width:520px;
+  line-height:1.7;
+  margin-top:2rem;
+  opacity:0;
+  animation:fadeUp 0.8s 0.6s forwards;
+}
+
+.hero-actions{
+  display:flex;
+  gap:1.2rem;
+  margin-top:3rem;
+  opacity:0;
+  animation:fadeUp 0.8s 0.8s forwards;
+}
+
+.btn-primary{
+  font-family:var(--cond);
+  font-size:0.9rem;
+  font-weight:600;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  padding:0.9rem 2.4rem;
+  background:var(--accent);
+  color:var(--black);
+  text-decoration:none;
+  transition:all 0.2s;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+}
+.btn-primary:hover{background:#E0BC5E;transform:translateY(-2px)}
+
+.btn-ghost{
+  font-family:var(--cond);
+  font-size:0.9rem;
+  font-weight:600;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  padding:0.9rem 2.4rem;
+  border:1px solid var(--border);
+  color:var(--text);
+  text-decoration:none;
+  transition:all 0.2s;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* hero stats bar */
+.hero-stats{
+  display:flex;
+  gap:3rem;
+  margin-top:5rem;
+  padding-top:2rem;
+  border-top:1px solid var(--border);
+  opacity:0;
+  animation:fadeUp 0.8s 1s forwards;
+}
+.stat-item{}
+.stat-num{
+  font-family:var(--display);
+  font-size:2.4rem;
+  color:var(--accent);
+  line-height:1;
+}
+.stat-label{
+  font-family:var(--mono);
+  font-size:0.65rem;
+  letter-spacing:0.15em;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-top:0.3rem;
+}
+
+/* hero right side graphic */
+.hero-graphic{
+  position:absolute;
+  right:-100px;
+  top:50%;
+  transform:translateY(-50%);
+  width:600px;
+  height:600px;
+  opacity:0.07;
+  animation:rotate 60s linear infinite, fadeIn 2s 0.5s forwards;
+}
+@keyframes rotate{to{transform:translateY(-50%) rotate(360deg)}}
+@keyframes fadeIn{to{opacity:0.07}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+/* TICKER */
+.ticker{
+  background:var(--accent);
+  padding:0.5rem 0;
+  overflow:hidden;
+  position:relative;
+  z-index:1;
+}
+.ticker-track{
+  display:flex;
+  gap:0;
+  white-space:nowrap;
+  animation:ticker 25s linear infinite;
+}
+.ticker-item{
+  font-family:var(--mono);
+  font-size:0.68rem;
+  letter-spacing:0.15em;
+  color:var(--black);
+  text-transform:uppercase;
+  padding:0 2rem;
+  flex-shrink:0;
+}
+.ticker-dot{color:rgba(0,0,0,0.4);padding:0 0.5rem}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTIONS */
+section{padding:6rem 4rem;position:relative;z-index:1}
+
+.section-label{
+  font-family:var(--mono);
+  font-size:0.68rem;
+  letter-spacing:0.2em;
+  color:var(--accent);
+  text-transform:uppercase;
+  margin-bottom:1rem;
+  display:flex;
+  align-items:center;
+  gap:0.8rem;
+}
+.section-label::before{content:'//';opacity:0.5}
+
+.section-title{
+  font-family:var(--display);
+  font-size:clamp(2.5rem,5vw,4.5rem);
+  line-height:0.95;
+  color:#fff;
+  letter-spacing:0.02em;
+}
+
+/* SERVICES */
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  margin-top:4rem;
+  background:var(--border);
+}
+
+.service-card{
+  background:var(--deep);
+  padding:2.5rem;
+  position:relative;
+  overflow:hidden;
+  transition:background 0.3s;
+}
+.service-card:hover{background:var(--card)}
+.service-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:var(--accent);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 0.3s;
+}
+.service-card:hover::before{transform:scaleX(1)}
+
+.service-num{
+  font-family:var(--mono);
+  font-size:0.65rem;
+  color:var(--accent);
+  letter-spacing:0.2em;
+  margin-bottom:1.5rem;
+  opacity:0.6;
+}
+.service-icon{
+  font-size:2rem;
+  margin-bottom:1.2rem;
+  display:block;
+}
+.service-title{
+  font-family:var(--cond);
+  font-size:1.3rem;
+  font-weight:700;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:#fff;
+  margin-bottom:1rem;
+}
+.service-desc{
+  font-size:0.88rem;
+  line-height:1.7;
+  color:var(--muted);
+  font-weight:300;
+}
+
+/* CAPABILITIES */
+.capabilities{background:var(--deep)}
+
+.cap-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6rem;
+  margin-top:4rem;
+  align-items:center;
+}
+
+.cap-list{display:flex;flex-direction:column;gap:0}
+
+.cap-item{
+  padding:1.5rem 0;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:flex-start;
+  gap:1.5rem;
+  cursor:default;
+  transition:padding-left 0.3s;
+}
+.cap-item:hover{padding-left:0.8rem}
+
+.cap-number{
+  font-family:var(--mono);
+  font-size:0.65rem;
+  color:var(--accent);
+  opacity:0.5;
+  padding-top:0.3rem;
+  min-width:28px;
+}
+.cap-content{}
+.cap-title{
+  font-family:var(--cond);
+  font-size:1.05rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:#fff;
+  margin-bottom:0.3rem;
+}
+.cap-text{
+  font-size:0.83rem;
+  color:var(--muted);
+  line-height:1.6;
+  font-weight:300;
+}
+
+/* terminal block */
+.terminal{
+  background:var(--black);
+  border:1px solid var(--border);
+  border-radius:2px;
+  overflow:hidden;
+}
+.terminal-header{
+  background:var(--surface);
+  padding:0.7rem 1rem;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  border-bottom:1px solid var(--border);
+}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{
+  font-family:var(--mono);
+  font-size:0.65rem;
+  color:var(--muted);
+  letter-spacing:0.1em;
+  margin-left:0.5rem;
+}
+.terminal-body{
+  padding:1.5rem;
+  font-family:var(--mono);
+  font-size:0.75rem;
+  line-height:2;
+}
+.t-prompt{color:var(--accent)}
+.t-cmd{color:var(--text)}
+.t-out{color:var(--muted)}
+.t-green{color:#4BC87B}
+.t-blue{color:var(--accent2)}
+.t-cursor{
+  display:inline-block;
+  width:8px;height:14px;
+  background:var(--accent);
+  animation:blink 1s infinite;
+  vertical-align:middle;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* CLIENTS / TRUST */
+.trust{border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+
+.trust-inner{
+  display:flex;
+  align-items:center;
+  gap:0;
+}
+.trust-label{
+  font-family:var(--mono);
+  font-size:0.65rem;
+  letter-spacing:0.15em;
+  color:var(--muted);
+  text-transform:uppercase;
+  min-width:160px;
+  padding-right:3rem;
+  border-right:1px solid var(--border);
+}
+.trust-logos{
+  display:flex;
+  gap:3rem;
+  padding-left:3rem;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.trust-logo{
+  font-family:var(--cond);
+  font-size:0.85rem;
+  font-weight:700;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--muted);
+  opacity:0.5;
+  transition:opacity 0.2s;
+}
+.trust-logo:hover{opacity:1;color:var(--accent)}
+
+/* TEAM */
+.team-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1.5rem;
+  margin-top:4rem;
+}
+.team-card{
+  position:relative;
+  overflow:hidden;
+}
+.team-img{
+  width:100%;
+  aspect-ratio:3/4;
+  background:var(--surface);
+  position:relative;
+  overflow:hidden;
+}
+.team-avatar{
+  width:100%;height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:4rem;
+  background:linear-gradient(135deg,var(--surface),var(--card));
+}
+.team-img::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top,rgba(8,10,12,0.9) 0%,transparent 60%);
+}
+.team-info{
+  padding:1rem 0;
+}
+.team-name{
+  font-family:var(--cond);
+  font-size:1rem;
+  font-weight:700;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:#fff;
+}
+.team-role{
+  font-family:var(--mono);
+  font-size:0.65rem;
+  letter-spacing:0.12em;
+  color:var(--accent);
+  text-transform:uppercase;
+  margin-top:0.2rem;
+}
+.team-bg{
+  font-size:0.78rem;
+  color:var(--muted);
+  margin-top:0.4rem;
+  line-height:1.5;
+  font-weight:300;
+}
+
+/* CTA SECTION */
+.cta-section{
+  background:var(--deep);
+  border-top:1px solid var(--border);
+  text-align:center;
+  padding:8rem 4rem;
+}
+.cta-tag{
+  display:inline-block;
+  font-family:var(--mono);
+  font-size:0.65rem;
+  letter-spacing:0.2em;
+  color:var(--black);
+  background:var(--accent);
+  padding:0.3rem 1rem;
+  text-transform:uppercase;
+  margin-bottom:2rem;
+}
+.cta-title{
+  font-family:var(--display);
+  font-size:clamp(3rem,7vw,6rem);
+  line-height:0.95;
+  color:#fff;
+  max-width:700px;
+  margin:0 auto 2rem;
+}
+.cta-sub{
+  font-size:1rem;
+  color:var(--muted);
+  max-width:480px;
+  margin:0 auto 3rem;
+  line-height:1.7;
+  font-weight:300;
+}
+.cta-contact{
+  font-family:var(--mono);
+  font-size:0.8rem;
+  color:var(--muted);
+  letter-spacing:0.1em;
+  margin-top:2rem;
+}
+.cta-contact a{color:var(--accent);text-decoration:none}
+
+/* FOOTER */
+footer{
+  background:var(--black);
+  border-top:1px solid var(--border);
+  padding:2rem 4rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.footer-logo{
+  font-family:var(--display);
+  font-size:1.2rem;
+  letter-spacing:0.1em;
+  color:var(--accent);
+}
+.footer-copy{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.12em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+.footer-links{display:flex;gap:2rem}
+.footer-links a{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.12em;
+  color:var(--muted);
+  text-decoration:none;
+  text-transform:uppercase;
+  transition:color 0.2s;
+}
+.footer-links a:hover{color:var(--accent)}
+
+/* CLASSIFICATION BAR */
+.classbar{
+  background:var(--red);
+  text-align:center;
+  padding:0.3rem;
+  font-family:var(--mono);
+  font-size:0.65rem;
+  letter-spacing:0.3em;
+  color:#fff;
+  text-transform:uppercase;
+}
+
+/* ANIMATIONS */
+.reveal{
+  opacity:0;
+  transform:translateY(30px);
+  transition:opacity 0.7s, transform 0.7s;
+}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  nav{padding:0 1.5rem}
+  .hero{padding:6rem 1.5rem 3rem}
+  section{padding:4rem 1.5rem}
+  .services-grid{grid-template-columns:1fr}
+  .cap-layout{grid-template-columns:1fr}
+  .team-grid{grid-template-columns:1fr 1fr}
+  .trust-inner{flex-direction:column;gap:1.5rem}
+  .trust-label{border-right:none;padding-right:0;border-bottom:1px solid var(--border);padding-bottom:1rem;min-width:unset}
+  .trust-logos{padding-left:0}
+  footer{flex-direction:column;gap:1rem;text-align:center}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="classbar">UNCLASSIFIED // FOR OFFICIAL USE ONLY // IRONVEIL DEFENSE GROUP</div>
+
+<nav>
+  <a href="#" class="nav-logo">IRONVEIL<span> DEFENSE</span></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#capabilities">Capabilities</a></li>
+    <li><a href="#team">Leadership</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Secure Briefing</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">Established 2009 &nbsp;·&nbsp; Strategic Defense Consulting</div>
+  <h1>
+    MISSION-<em>CRITICAL</em><br>
+    <span class="outline">INTELLIGENCE</span><br>
+    SOLUTIONS
+  </h1>
+  <p class="hero-sub">We advise governments, defense contractors, and allied forces on platform strategy, cyber resilience, and operational readiness in contested environments.</p>
+  <div class="hero-actions">
+    <a href="#services" class="btn-primary">Our Capabilities</a>
+    <a href="#contact" class="btn-ghost">Request Briefing</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">34</div>
+      <div class="stat-label">Nations served</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">400+</div>
+      <div class="stat-label">Engagements completed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">15yr</div>
+      <div class="stat-label">Operational experience</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">TS/SCI</div>
+      <div class="stat-label">Cleared personnel</div>
+    </div>
+  </div>
+
+  <!-- decorative hexagon -->
+  <svg class="hero-graphic" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="200,10 380,110 380,290 200,390 20,290 20,110" stroke="#C8A84B" stroke-width="1" fill="none"/>
+    <polygon points="200,40 350,125 350,275 200,360 50,275 50,125" stroke="#C8A84B" stroke-width="0.5" fill="none"/>
+    <polygon points="200,70 320,140 320,260 200,330 80,260 80,140" stroke="#C8A84B" stroke-width="0.3" fill="none"/>
+    <circle cx="200" cy="200" r="60" stroke="#C8A84B" stroke-width="0.5"/>
+    <circle cx="200" cy="200" r="100" stroke="#C8A84B" stroke-width="0.3" stroke-dasharray="4 8"/>
+    <circle cx="200" cy="200" r="140" stroke="#C8A84B" stroke-width="0.2" stroke-dasharray="2 12"/>
+    <line x1="200" y1="10" x2="200" y2="390" stroke="#C8A84B" stroke-width="0.3" opacity="0.5"/>
+    <line x1="20" y1="200" x2="380" y2="200" stroke="#C8A84B" stroke-width="0.3" opacity="0.5"/>
+    <line x1="20" y1="110" x2="380" y2="290" stroke="#C8A84B" stroke-width="0.2" opacity="0.3"/>
+    <line x1="20" y1="290" x2="380" y2="110" stroke="#C8A84B" stroke-width="0.2" opacity="0.3"/>
+    <circle cx="200" cy="200" r="6" fill="#C8A84B" opacity="0.8"/>
+  </svg>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item">Threat Intelligence <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Cyber Operations <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Platform Hardening <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Strategic Advisory <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Force Modernization <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Cloud-Native Defense Platforms <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Kubernetes Security <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Zero Trust Architecture <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Threat Intelligence <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Cyber Operations <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Platform Hardening <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Strategic Advisory <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Force Modernization <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Cloud-Native Defense Platforms <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Kubernetes Security <span class="ticker-dot">◆</span></span>
+    <span class="ticker-item">Zero Trust Architecture <span class="ticker-dot">◆</span></span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label">What we do</div>
+  <h2 class="section-title reveal">CORE<br>SERVICES</h2>
+  <div class="services-grid reveal">
+    <div class="service-card">
+      <div class="service-num">01 / 06</div>
+      <span class="service-icon">⬡</span>
+      <div class="service-title">Cloud-Native Platform Engineering</div>
+      <p class="service-desc">Design and deployment of hardened Kubernetes-based platforms for defense workloads. Container orchestration, GitOps pipelines, and automated scaling at mission-critical standards.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">02 / 06</div>
+      <span class="service-icon">◈</span>
+      <div class="service-title">Cyber Threat Intelligence</div>
+      <p class="service-desc">Continuous monitoring, threat actor profiling, and actionable intelligence to anticipate and neutralize advanced persistent threats before they impact operations.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">03 / 06</div>
+      <span class="service-icon">⬔</span>
+      <div class="service-title">Zero Trust Architecture</div>
+      <p class="service-desc">Implementation of identity-centric security frameworks across classified and unclassified networks, eliminating implicit trust from legacy infrastructure.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">04 / 06</div>
+      <span class="service-icon">◎</span>
+      <div class="service-title">Operational Technology Security</div>
+      <p class="service-desc">Securing critical infrastructure and industrial control systems against nation-state adversaries, with minimal operational disruption and maximum resilience.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">05 / 06</div>
+      <span class="service-icon">⬡</span>
+      <div class="service-title">Force Modernization Advisory</div>
+      <p class="service-desc">Strategic guidance on transitioning legacy defense systems to modern cloud-native architectures while maintaining compliance with DoD and NATO frameworks.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">06 / 06</div>
+      <span class="service-icon">◈</span>
+      <div class="service-title">Incident Response & Recovery</div>
+      <p class="service-desc">Rapid deployment of elite response teams for active breach containment, forensic analysis, and full operational restoration within defined recovery time objectives.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="trust" style="padding:2.5rem 4rem">
+  <div class="trust-inner reveal">
+    <div class="trust-label">Trusted by</div>
+    <div class="trust-logos">
+      <span class="trust-logo">NATO Allied Command</span>
+      <span class="trust-logo">Five Eyes Partners</span>
+      <span class="trust-logo">DARPA</span>
+      <span class="trust-logo">DHS CISA</span>
+      <span class="trust-logo">UK MOD</span>
+      <span class="trust-logo">Raytheon</span>
+    </div>
+  </div>
+</section>
+
+<!-- CAPABILITIES -->
+<section id="capabilities" class="capabilities">
+  <div class="section-label">Technical depth</div>
+  <h2 class="section-title reveal">PLATFORM<br>CAPABILITIES</h2>
+  <div class="cap-layout">
+    <div class="cap-list reveal">
+      <div class="cap-item">
+        <div class="cap-number">01</div>
+        <div class="cap-content">
+          <div class="cap-title">Kubernetes Cluster Hardening</div>
+          <div class="cap-text">Multi-node kubeadm deployments with RBAC, network policies, pod security standards, and runtime threat detection via Falco.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-number">02</div>
+        <div class="cap-content">
+          <div class="cap-title">GitOps Delivery Pipelines</div>
+          <div class="cap-text">ArgoCD-driven continuous deployment with drift detection, automated rollback, and full audit trails for every change deployed to the cluster.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-number">03</div>
+        <div class="cap-content">
+          <div class="cap-title">Observability Stack</div>
+          <div class="cap-text">Prometheus metrics collection, alerting rules, and performance dashboards tuned for defense SLA requirements and anomaly detection.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-number">04</div>
+        <div class="cap-content">
+          <div class="cap-title">Auto-Scaling Infrastructure</div>
+          <div class="cap-text">HPA and cluster autoscaler configuration ensuring platforms scale from baseline to surge capacity within 90 seconds under sustained load.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-number">05</div>
+        <div class="cap-content">
+          <div class="cap-title">Air-Gapped Deployments</div>
+          <div class="cap-text">Full platform engineering for disconnected environments — private registries, offline Helm charts, and isolated cluster bootstrapping.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- terminal -->
+    <div class="terminal reveal">
+      <div class="terminal-header">
+        <div class="terminal-dot" style="background:#C84B4B"></div>
+        <div class="terminal-dot" style="background:#C8A84B"></div>
+        <div class="terminal-dot" style="background:#4BC87B"></div>
+        <span class="terminal-title">platform-ops // cluster-status</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">ops@ironveil:~$ </span><span class="t-cmd">kubectl get nodes</span></div>
+        <div><span class="t-out">NAME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STATUS&nbsp;&nbsp;&nbsp;ROLES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AGE&nbsp;&nbsp;&nbsp;VERSION</span></div>
+        <div><span class="t-green">control-plane&nbsp;&nbsp;&nbsp;Ready&nbsp;&nbsp;&nbsp;&nbsp;control-plane&nbsp;&nbsp;&nbsp;15h&nbsp;&nbsp;&nbsp;v1.33.0</span></div>
+        <div><span class="t-green">worker1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ready&nbsp;&nbsp;&nbsp;&nbsp;&lt;none&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;14h&nbsp;&nbsp;&nbsp;v1.33.0</span></div>
+        <div><span class="t-green">worker2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ready&nbsp;&nbsp;&nbsp;&nbsp;&lt;none&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;14h&nbsp;&nbsp;&nbsp;v1.33.0</span></div>
+        <br>
+        <div><span class="t-prompt">ops@ironveil:~$ </span><span class="t-cmd">kubectl get pods -n monitoring</span></div>
+        <div><span class="t-out">NAME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;READY&nbsp;&nbsp;&nbsp;STATUS</span></div>
+        <div><span class="t-green">prometheus-78f4bdd6bd-rj7nh&nbsp;&nbsp;&nbsp;1/1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running</span></div>
+        <br>
+        <div><span class="t-prompt">ops@ironveil:~$ </span><span class="t-cmd">kubectl get hpa -n platform-demo</span></div>
+        <div><span class="t-blue">platform-demo-hpa&nbsp;&nbsp;&nbsp;Deployment/platform-demo&nbsp;&nbsp;&nbsp;2/5</span></div>
+        <br>
+        <div><span class="t-prompt">ops@ironveil:~$ </span><span class="t-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="section-label">Leadership</div>
+  <h2 class="section-title reveal">SENIOR<br>ADVISORS</h2>
+  <div class="team-grid reveal">
+    <div class="team-card">
+      <div class="team-img">
+        <div class="team-avatar">◈</div>
+      </div>
+      <div class="team-info">
+        <div class="team-name">Brig. Gen. Marcus Holt</div>
+        <div class="team-role">Chief Executive Officer</div>
+        <div class="team-bg">30 years US Army Cyber Command. Former DIRNSA liaison. Led digital transformation of SOCOM infrastructure.</div>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-img">
+        <div class="team-avatar">⬡</div>
+      </div>
+      <div class="team-info">
+        <div class="team-name">Dr. Aisha Karimi</div>
+        <div class="team-role">Chief Technology Officer</div>
+        <div class="team-bg">PhD Computer Science, MIT. Former NSA TAO. Pioneered zero-trust frameworks now adopted across Five Eyes networks.</div>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-img">
+        <div class="team-avatar">◎</div>
+      </div>
+      <div class="team-info">
+        <div class="team-name">Col. James Ashford</div>
+        <div class="team-role">Director, Platform Engineering</div>
+        <div class="team-bg">Former RAF Digital Squadron commander. Specialist in Kubernetes hardening for air-gapped defense environments.</div>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-img">
+        <div class="team-avatar">⬔</div>
+      </div>
+      <div class="team-info">
+        <div class="team-name">Yuki Tanaka</div>
+        <div class="team-role">Head of Threat Intelligence</div>
+        <div class="team-bg">15 years APT tracking across APAC theater. Built intelligence sharing frameworks for ASEAN defense ministries.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="contact" class="cta-section">
+  <div class="cta-tag">Secure Communications</div>
+  <h2 class="cta-title reveal">READY TO BRIEF YOUR COMMAND?</h2>
+  <p class="cta-sub reveal">All engagements begin with a classified needs assessment. Our team operates under NDA from first contact.</p>
+  <div class="reveal">
+    <a href="mailto:ops@ironveil-defense.com" class="btn-primary">Request Secure Briefing</a>
+  </div>
+  <div class="cta-contact reveal">
+    Secure line: <a href="tel:+17035550198">+1 (703) 555-0198</a>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    Signal: <a href="#">@ironveil-ops</a>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    SCIF appointments available
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">IRONVEIL DEFENSE</div>
+  <div class="footer-copy">© 2025 IronVeil Defense Group LLC. All rights reserved.</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Security Policy</a>
+    <a href="#">Cleared Careers</a>
+  </div>
+</footer>
+<div class="classbar">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if(e.isIntersecting){
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+    }
+  });
+}, {threshold: 0.1});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
