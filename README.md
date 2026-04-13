@@ -30,9 +30,9 @@ This project demonstrates a complete cloud-native platform engineering solution 
 
 | Objective | How it is met |
 |-----------|--------------|
-| **A** — Develop platforms for deploying cloud-native apps | ArgoCD GitOps pipeline auto-deploys from GitHub to Kubernetes |
-| **B** — Use Kubernetes and Docker to orchestrate containers | Kubernetes Deployment with 2 replicas, health probes, NodePort service |
-| **C** — Optimize for scalability and resource efficiency | HPA auto-scales pods 2 → 5 based on CPU, Prometheus monitors performance |
+| **A**Develop platforms for deploying cloud-native apps | ArgoCD GitOps pipeline auto-deploys from GitHub to Kubernetes |
+| **B**Use Kubernetes and Docker to orchestrate containers | Kubernetes Deployment with 2 replicas, health probes, NodePort service |
+| **C**Optimize for scalability and resource efficiency | HPA auto-scales pods 2 → 5 based on CPU, Prometheus monitors performance |
 
 ---
 
@@ -70,7 +70,7 @@ platform-cloud-native-application-development/
 
 - **Cloud:** AWS EC2
 - **Instance type:** t2.medium (2 vCPU, 4 GB RAM)
-- **OS:** Ubuntu 22.04 LTS
+- **OS:** Ubuntu 24.04 LTS
 - **Cluster setup:** kubeadm
 - **Kubernetes version:** v1.33.0
 - **Nodes:**
