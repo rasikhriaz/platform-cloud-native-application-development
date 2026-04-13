@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: platform-demo
-  namespace: monitoring
+  name: prometheus-config
+  namespace: platform-demo
 data:
   prometheus.yml: |
     global:
@@ -15,26 +15,14 @@ data:
           - targets: ['platform-demo.platform-demo.svc.cluster.local:80']
         metrics_path: '/metrics'
 
-      - job_name: 'kubernetes-pods'
-        kubernetes_sd_configs:
-          - role: pod
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-            action: keep
-            regex: true
-          - source_labels: [__meta_kubernetes_pod_ip, __meta_kubernetes_pod_annotation_prometheus_io_port]
-            action: replace
-            target_label: __address__
-            separator: ':'
-            regex: (.+);(.+)
-
-      - job_name: 'kubernetes-nodes'
+      - job_name: 'kubernetes-cadvisor'
         scheme: https
         tls_config:
           insecure_skip_verify: true
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         kubernetes_sd_configs:
           - role: node
+        metrics_path: /metrics/cadvisor
         relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
