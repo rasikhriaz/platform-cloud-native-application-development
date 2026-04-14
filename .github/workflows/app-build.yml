@@ -25,4 +25,4 @@ jobs:
           context: ./app
           file: ./docker/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/platform-demo:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cloud-native-app:latest
