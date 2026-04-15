@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: platform-demo
-          image: rasikh11/cloud-native-app:382dfb0
+          image: rasikh11/cloud-native-app:5e840c8
           ports:
             - containerPort: 3000
           resources:
