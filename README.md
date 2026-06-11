@@ -1,4 +1,4 @@
-Platform Engineering & Cloud-Native Application Development
+# Platform Engineering & Cloud-Native Application Development
 
 **Name:** Muhammad Rasikh Riaz  
 **Email:** mo.rasikh11@gmail.com  
@@ -8,7 +8,7 @@ Platform Engineering & Cloud-Native Application Development
 
 ## Project Overview
 
-This project demonstrates a complete cloud-native platform engineering solution built using open-source technologies. The platform supports the full lifecycle of a cloud-native application — from source code to automated deployment, auto-scaling, and real-time monitoring — running on a production-grade 3-node Kubernetes cluster provisioned on AWS EC2.
+This project demonstrates a complete cloud-native platform engineering solution built using open-source technologies. The platform supports the full lifecycle of a cloud-native application from source code to automated deployment, auto-scaling, and real-time monitoring running on a production-grade 3-node Kubernetes cluster provisioned on AWS EC2.
 
 ---
 
@@ -120,7 +120,7 @@ A lightweight Node.js HTTP server exposing three endpoints:
 
 ---
 
-## CI/CD Pipeline — GitHub Actions + ArgoCD
+## CI/CD Pipeline GitHub Actions + ArgoCD
 
 ### How it works
 Developer git push
@@ -139,14 +139,14 @@ ArgoCD detects change in GitHub repo
 Auto-syncs new deployment to Kubernetes cluster
 │
 ▼
-Pods rolling updated — zero downtime
+Pods rolling updated zero downtime
 
 ### Key GitOps principles applied
 
-- **Git is the single source of truth** — every cluster change goes through GitHub
-- **Auto-sync enabled** — ArgoCD applies changes within 3 minutes of a push
-- **Self-heal enabled** — ArgoCD corrects any manual changes made directly to the cluster
-- **Drift detection** — ArgoCD alerts if cluster state differs from repo state
+- **Git is the single source of truth** every cluster change goes through GitHub
+- **Auto-sync enabled** ArgoCD applies changes within 3 minutes of a push
+- **Self-heal enabled** ArgoCD corrects any manual changes made directly to the cluster
+- **Drift detection** ArgoCD alerts if cluster state differs from repo state
 
 ### ArgoCD sync policy
 
@@ -161,9 +161,9 @@ syncPolicy:
 
 ---
 
-## Kubernetes Setup — kubeadm
+## Kubernetes Setup kubeadm
 
-### Step 1 — Run on ALL 3 nodes
+### Step 1 Run on ALL 3 nodes
 
 ```bash
 # Disable swap
@@ -183,7 +183,7 @@ apt-get install -y kubelet=1.29.0-1.1 kubeadm=1.29.0-1.1 kubectl=1.29.0-1.1
 apt-mark hold kubelet kubeadm kubectl
 ```
 
-### Step 2 — Run on MASTER only
+### Step 2 Run on MASTER only
 
 ```bash
 kubeadm init \
@@ -204,7 +204,7 @@ kubectl patch deployment metrics-server -n kube-system \
   -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 ```
 
-### Step 3 — Run on WORKER nodes
+### Step 3 Run on WORKER nodes
 
 ```bash
 # Use the join command printed after kubeadm init
@@ -280,7 +280,7 @@ Access Grafana UI: `http://YOUR_NODE_IP:30030` — Username: `admin` | Password:
 
 1. Go to **Connections → Data Sources → Add data source → Prometheus**
 2. Set URL to: `http://prometheus.platform-demo.svc.cluster.local:9090`
-3. Click **Save & Test** — should show green tick
+3. Click **Save & Test** should show green tick
 
 ### Dashboard Panels
 
@@ -297,17 +297,17 @@ Access Grafana UI: `http://YOUR_NODE_IP:30030` — Username: `admin` | Password:
 
 Open three terminals:
 
-**Terminal 1 — Watch HPA:**
+**Terminal 1 Watch HPA:**
 ```bash
 watch kubectl get hpa -n platform-demo
 ```
 
-**Terminal 2 — Watch pods:**
+**Terminal 2 Watch pods:**
 ```bash
 watch kubectl get pods -n platform-demo
 ```
 
-**Terminal 3 — Run load generator:**
+**Terminal 3 Run load generator:**
 ```bash
 kubectl run load-generator \
   --image=busybox \
