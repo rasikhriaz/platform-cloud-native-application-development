@@ -1,4 +1,4 @@
-markdown# Platform Engineering & Cloud-Native Application Development
+Platform Engineering & Cloud-Native Application Development
 
 **Name:** Muhammad Rasikh Riaz  
 **Email:** mo.rasikh11@gmail.com  
@@ -38,28 +38,31 @@ This project demonstrates a complete cloud-native platform engineering solution 
 
 ## Repository Structure
 platform-cloud-native-application-development/
-├── .github/
-│   └── workflows/
-│       └── app-build.yml          # CI — build, push, update deployment
-├── app/
-│   ├── index.js                   # Node.js app with /metrics and /health
-│   └── index.html                 # IronVeil Defense landing page
-├── docker/
-│   └── Dockerfile                 # Container image definition
-├── kubernetes/
-│   ├── base/
-│   │   ├── namespace.yaml         # platform-demo namespace
-│   │   ├── deployment.yml         # 2 replicas + health probes
-│   │   ├── service.yaml           # NodePort — port 80 → 3000
-│   │   ├── hpa.yml                # Auto-scale 2 → 5 pods at 50% CPU
-│   │   ├── metrics-server.yaml    # Metrics Server for HPA CPU signal
-│   │   └── rbac.yaml              # Role + RoleBinding for platform-demo
-│   └── argocd/
-│       └── application.yml        # ArgoCD app pointing to this repo
-└── monitoring/
-├── prometheus.yml              # ConfigMap + Deployment + Service
-├── grafana.yaml                # Deployment + Service
-└── service-account.yml        # ClusterRole + ClusterRoleBinding for Prometheus
+<pre><span style="background-color:#D0CFCC"><font color="#171421">├── .github/</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   └── workflows/</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│       └── app-build.yml          # CI — build, push, update deployment</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">├── app/</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   ├── index.js                   # Node.js app with /metrics and /health</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   └── index.html                 # IronVeil Defense landing page</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">├── docker/</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   └── Dockerfile                 # Container image definition</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">├── kubernetes/</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   ├── base/</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── namespace.yaml         # platform-demo namespace</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── deployment.yml         # 2 replicas + health probes</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── service.yaml           # NodePort — port 80 → 3000</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── hpa.yml                # Auto-scale 2 → 5 pods at 50% CPU</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── metrics-server.yaml    # Metrics Server for HPA CPU signal</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   │   └── rbac.yaml              # Role + RoleBinding for platform-demo</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│   └── argocd/</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">│       └── application.yml        # ArgoCD app pointing to this repo</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">└── monitoring/</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">├── prometheus.yml              # ConfigMap + Deployment + Service</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">├── grafana.yaml                # Deployment + Service</font></span>
+<span style="background-color:#D0CFCC"><font color="#171421">└── service-account.yml        # ClusterRole + ClusterRoleBinding for Prometheus</font></span>
+
+
+</pre>
 
 ---
 
