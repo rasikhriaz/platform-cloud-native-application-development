@@ -1,8 +1,8 @@
-# Platform Engineering and Cloud-Native Application Development
+markdown# Platform Engineering & Cloud-Native Application Development
 
-**Student:** Muhammad Rasikh Riaz  
+**Name:** Muhammad Rasikh Riaz  
 **Email:** mo.rasikh11@gmail.com  
-**Diploma:** Diploma in DevSysOps Engineering  
+**GitHub:** [rasikhriaz/platform-cloud-native-application-development](https://github.com/rasikhriaz/platform-cloud-native-application-development)
 
 ---
 
@@ -37,32 +37,29 @@ This project demonstrates a complete cloud-native platform engineering solution 
 ---
 
 ## Repository Structure
-
-```
 platform-cloud-native-application-development/
 ├── .github/
 │   └── workflows/
 │       └── app-build.yml          # CI — build, push, update deployment
 ├── app/
 │   ├── index.js                   # Node.js app with /metrics and /health
-│   ├── index.html                 # IronVeil Defense landing page
-│   └── package.json
+│   └── index.html                 # IronVeil Defense landing page
 ├── docker/
 │   └── Dockerfile                 # Container image definition
 ├── kubernetes/
 │   ├── base/
 │   │   ├── namespace.yaml         # platform-demo namespace
 │   │   ├── deployment.yml         # 2 replicas + health probes
-│   │   ├── service.yaml           # NodePort — port 80
-│   │   └── hpa.yml                # Auto-scale 2 → 5 pods
+│   │   ├── service.yaml           # NodePort — port 80 → 3000
+│   │   ├── hpa.yml                # Auto-scale 2 → 5 pods at 50% CPU
+│   │   ├── metrics-server.yaml    # Metrics Server for HPA CPU signal
+│   │   └── rbac.yaml              # Role + RoleBinding for platform-demo
 │   └── argocd/
-│       └── application.yaml       # ArgoCD app pointing to this repo
+│       └── application.yml        # ArgoCD app pointing to this repo
 └── monitoring/
-    ├── prometheus/
-    │   └── prometheus.yaml        # ConfigMap + Deployment + Service
-    └── grafana/
-        └── grafana.yaml           # Deployment + Service
-```
+├── prometheus.yml              # ConfigMap + Deployment + Service
+├── grafana.yaml                # Deployment + Service
+└── service-account.yml        # ClusterRole + ClusterRoleBinding for Prometheus
 
 ---
 
@@ -74,19 +71,43 @@ platform-cloud-native-application-development/
 - **Cluster setup:** kubeadm
 - **Kubernetes version:** v1.33.0
 - **Nodes:**
-
-```
 NAME            STATUS   ROLES           AGE   VERSION
 control-plane   Ready    control-plane   15h   v1.33.0
 worker1         Ready    <none>          14h   v1.33.0
 worker2         Ready    <none>          14h   v1.33.0
-```
+
+---
+
+## Platform Architecture
+Developer
+│
+│  git push
+▼
+GitHub Repository
+│
+├──► GitHub Actions
+│         │
+│         ├── Build Docker image
+│         ├── Push rasikh11/cloud-native-app:<commit-sha>
+│         └── Update image tag in deployment.yml
+│
+└──► ArgoCD (watches repo)
+│
+│  auto-sync
+▼
+Kubernetes Cluster  [namespace: platform-demo]
+│
+├── Deployment (2 replicas)
+├── Service (NodePort)
+├── HPA ◄── Metrics Server (CPU signal)
+│
+└── Prometheus ──► Grafana
 
 ---
 
 ## Application
 
-A lightweight Node.js HTTP server that exposes three endpoints:
+A lightweight Node.js HTTP server exposing three endpoints:
 
 | Endpoint | Purpose |
 |----------|---------|
@@ -99,26 +120,23 @@ A lightweight Node.js HTTP server that exposes three endpoints:
 ## CI/CD Pipeline — GitHub Actions + ArgoCD
 
 ### How it works
-
-```
 Developer git push
-      │
-      ▼
+│
+▼
 GitHub Actions triggered
-      │
-      ├── Build Docker image
-      ├── Push rasikh11/cloud-native-app:<commit-sha> to Docker Hub
-      └── Update image tag in kubernetes/base/deployment.yml
-                │
-                ▼
-          ArgoCD detects change in GitHub repo
-                │
-                ▼
-          Auto-syncs new deployment to Kubernetes cluster
-                │
-                ▼
-          Pods rolling updated — zero downtime
-```
+│
+├── Build Docker image
+├── Push rasikh11/cloud-native-app:<commit-sha> to Docker Hub
+└── Update image tag in kubernetes/base/deployment.yml
+│
+▼
+ArgoCD detects change in GitHub repo
+│
+▼
+Auto-syncs new deployment to Kubernetes cluster
+│
+▼
+Pods rolling updated — zero downtime
 
 ### Key GitOps principles applied
 
@@ -197,15 +215,16 @@ kubeadm join <MASTER_IP>:6443 \
 ## Deploy the Application
 
 ```bash
-# Create namespace
+# Apply namespace first
 kubectl apply -f kubernetes/base/namespace.yaml
 
-# Deploy app
+# Deploy RBAC and app
+kubectl apply -f kubernetes/base/rbac.yaml
 kubectl apply -f kubernetes/base/deployment.yml
 kubectl apply -f kubernetes/base/service.yaml
 kubectl apply -f kubernetes/base/hpa.yml
 
-# Verify
+# Verify everything is running
 kubectl get all -n platform-demo
 ```
 
@@ -231,57 +250,33 @@ Access ArgoCD UI: `https://YOUR_NODE_IP:30443`
 Username: `admin` | Password: from command above
 
 ```bash
-# Apply ArgoCD application — points to this repo
-kubectl apply -f kubernetes/argocd/application.yaml
+# Connect ArgoCD to this repo
+kubectl apply -f kubernetes/argocd/application.yml
 ```
 
 ---
 
-## Deploy Prometheus
+## Deploy Monitoring (Prometheus + Grafana)
 
 ```bash
-# Create monitoring namespace
-kubectl create namespace monitoring
+# Apply Prometheus RBAC, ConfigMap, Deployment and Service
+kubectl apply -f monitoring/service-account.yml
+kubectl apply -f monitoring/prometheus.yml
 
-# Deploy Prometheus ConfigMap, Deployment and Service
-kubectl apply -f monitoring/prometheus/prometheus.yaml
-
-# Verify
-kubectl get all -n monitoring
-```
-
-Access Prometheus UI: `http://YOUR_NODE_IP:30090`
-
-### What Prometheus monitors
-
-| Metric | Type | Description |
-|--------|------|-------------|
-| `http_requests_total` | Counter | Total HTTP requests served by the app |
-| `up` | Gauge | Scrape target health — 1 = healthy |
-| `container_cpu_usage_seconds_total` | Counter | CPU consumption per pod |
-| `container_memory_usage_bytes` | Gauge | Memory usage per pod |
-
----
-
-## Deploy Grafana
-
-```bash
-kubectl apply -f monitoring/grafana/grafana.yaml
+# Deploy Grafana
+kubectl apply -f monitoring/grafana.yaml
 
 # Verify
-kubectl get all -n monitoring
+kubectl get all -n platform-demo
 ```
 
-Access Grafana UI: `http://YOUR_NODE_IP:30030`  
-Username: `admin` | Password: `admin123`
+Access Prometheus UI: `http://YOUR_NODE_IP:30090`  
+Access Grafana UI: `http://YOUR_NODE_IP:30030` — Username: `admin` | Password: `admin123`
 
-### Connect Prometheus as Data Source
+### Connect Prometheus as Grafana Data Source
 
 1. Go to **Connections → Data Sources → Add data source → Prometheus**
-2. Set URL to:
-```
-http://prometheus.monitoring.svc.cluster.local:9090
-```
+2. Set URL to: `http://prometheus.platform-demo.svc.cluster.local:9090`
 3. Click **Save & Test** — should show green tick
 
 ### Dashboard Panels
@@ -297,9 +292,7 @@ http://prometheus.monitoring.svc.cluster.local:9090
 
 ## HPA Auto-Scaling Test
 
-### Watch pods scale in real time
-
-Open two terminals:
+Open three terminals:
 
 **Terminal 1 — Watch HPA:**
 ```bash
@@ -321,26 +314,32 @@ kubectl run load-generator \
 ```
 
 ### Expected scaling behaviour
-
-```
 CPU: 12%  →  pods: 2   (baseline)
 CPU: 62%  →  pods: 3   (HPA triggers)
 CPU: 81%  →  pods: 4   (scaling up)
 CPU: 48%  →  pods: 5   (max replicas)
-```
 
-### Stop load test and watch scale down
-
+**Stop load test:**
 ```bash
 kubectl delete pod load-generator -n platform-demo
 # Pods scale back to 2 after ~5 minutes
 ```
 
-### Check HPA events
-
+**Check HPA events:**
 ```bash
 kubectl describe hpa platform-demo-hpa -n platform-demo
 ```
+
+---
+
+## Access URLs
+
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| App | `http://NODE_IP:30080` | — |
+| Prometheus | `http://NODE_IP:30090` | — |
+| Grafana | `http://NODE_IP:30030` | admin / admin123 |
+| ArgoCD | `https://NODE_IP:30443` | admin / (generated) |
 
 ---
 
@@ -357,14 +356,14 @@ kubectl describe hpa platform-demo-hpa -n platform-demo
 
 ---
 
-## Access URLs
+## GitHub Actions Secrets Required
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| App | `http://NODE_IP:30080` | — |
-| Prometheus | `http://NODE_IP:30090` | — |
-| Grafana | `http://NODE_IP:30030` | admin / admin123 |
-| ArgoCD | `https://NODE_IP:30443` | admin / (generated) |
+Go to **Settings → Secrets and variables → Actions** and add:
+
+| Secret | Value |
+|--------|-------|
+| `DOCKERHUB_USERNAME` | `rasikh11` |
+| `DOCKERHUB_TOKEN` | Your Docker Hub access token |
 
 ---
 
@@ -391,19 +390,8 @@ kubectl patch deployment metrics-server -n kube-system \
 
 **Prometheus targets down:**
 ```bash
-kubectl rollout restart deployment/prometheus -n monitoring
+kubectl rollout restart deployment/prometheus -n platform-demo
 ```
-
----
-
-## GitHub Actions Secrets Required
-
-Go to **Settings → Secrets and variables → Actions** and add:
-
-| Secret | Value |
-|--------|-------|
-| `DOCKERHUB_USERNAME` | `--` |
-| `DOCKERHUB_TOKEN` | Your Docker Hub access token |
 
 ---
 
