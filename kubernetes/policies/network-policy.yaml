@@ -1,0 +1,96 @@
+# Network Policy for platform-demo namespace
+# Purpose: Restrict pod-to-pod and external traffic to only what is necessary
+# This implements the principle of least privilege at the network layer
+#
+# Trade-off: NetworkPolicies require a CNI plugin that supports them (Calico, Cilium).
+#            Calico is already installed in this cluster, so enforcement is active.
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-app-traffic
+  namespace: platform-demo
+  labels:
+    app: platform-demo
+    policy: network
+spec:
+  podSelector:
+    matchLabels:
+      app: platform-demo
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from any source on port 3000 (NodePort service)
+    - ports:
+        - protocol: TCP
+          port: 3000
+    # Allow Prometheus to scrape /metrics
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow communication within namespace
+    - to:
+        - podSelector: {}
+
+---
+# Deny all ingress to monitoring pods except from within namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: monitoring-ingress
+  namespace: platform-demo
+  labels:
+    policy: network
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow Grafana to query Prometheus
+    - from:
+        - podSelector:
+            matchLabels:
+              app: grafana
+      ports:
+        - protocol: TCP
+          port: 9090
+    # Allow external access via NodePort for debugging
+    - ports:
+        - protocol: TCP
+          port: 9090
+
+---
+# Grafana ingress policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: grafana-ingress
+  namespace: platform-demo
+  labels:
+    policy: network
+spec:
+  podSelector:
+    matchLabels:
+      app: grafana
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 3000

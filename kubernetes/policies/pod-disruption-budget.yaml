@@ -1,0 +1,25 @@
+# Pod Disruption Budget (PDB)
+# Purpose: Ensure at least 1 pod is always running during voluntary disruptions
+#          such as node drains, cluster upgrades, or maintenance windows.
+#
+# Policy rationale:
+#   - minAvailable: 1 guarantees zero downtime during rolling updates
+#   - If only 1 pod is running, kubectl drain will block until HPA scales up another
+#   - This is critical for production SLAs
+#
+# Trade-off: Setting minAvailable too high can block cluster maintenance.
+#            For a 2-replica deployment, minAvailable=1 allows 1 pod to be evicted at a time.
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: platform-demo-pdb
+  namespace: platform-demo
+  labels:
+    app: platform-demo
+    policy: disruption
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: platform-demo

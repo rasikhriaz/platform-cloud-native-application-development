@@ -1,0 +1,76 @@
+# Image Pull Policy and Trusted Registry Configuration
+# Purpose: Ensure only approved container images from trusted registries are deployed
+#
+# Governance rationale:
+#   - All deployments MUST use images from Docker Hub under the rasikh11/ namespace
+#   - Images MUST use specific tags (never :latest) for reproducibility and audit
+#   - imagePullPolicy: Always ensures the cluster always pulls the exact tagged image
+#   - In production, this would be enforced via OPA Gatekeeper or Kyverno admission controllers
+#
+# Example Kyverno policy (for reference — not deployed in this demo cluster):
+#
+#   apiVersion: kyverno.io/v1
+#   kind: ClusterPolicy
+#   metadata:
+#     name: restrict-image-registries
+#   spec:
+#     validationFailureAction: Enforce
+#     rules:
+#       - name: validate-registries
+#         match:
+#           any:
+#             - resources:
+#                 kinds:
+#                   - Pod
+#         validate:
+#           message: "Images must come from docker.io/rasikh11/ repository"
+#           pattern:
+#             spec:
+#               containers:
+#                 - image: "docker.io/rasikh11/*"
+#
+# Current enforcement mechanism:
+#   - ArgoCD auto-sync ensures only images defined in Git are deployed
+#   - GitHub Actions CI pipeline builds and tags images with commit SHA
+#   - Manual kubectl apply with unapproved images will be overwritten by ArgoCD self-heal
+
+---
+# This ConfigMap documents the image approval policy for the platform
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: image-policy-doc
+  namespace: platform-demo
+  labels:
+    app: platform-demo
+    policy: governance
+data:
+  policy: |
+    IMAGE APPROVAL POLICY — platform-demo namespace
+    ================================================
+    1. All container images MUST originate from: docker.io/rasikh11/
+    2. All images MUST use a specific SHA-based tag (e.g., cloud-native-app:abc1234)
+    3. The :latest tag is PROHIBITED in production deployments
+    4. Image updates MUST go through the CI pipeline (GitHub Actions)
+    5. Direct kubectl set image commands are NOT permitted
+    6. ArgoCD self-heal will revert any manual image change within 3 minutes
+    7. All image builds are logged in GitHub Actions run history for audit
+
+  rollback-procedure: |
+    ROLLBACK PROCEDURE
+    ==================
+    1. Identify the last known good commit SHA in GitHub
+    2. Revert the deployment.yml image tag to that SHA via git revert or manual edit
+    3. Push to main branch — ArgoCD will auto-sync the rollback
+    4. Verify pods are running: kubectl get pods -n platform-demo
+    5. Check application health: curl http://NODE_IP:30080/health
+    6. Monitor Grafana dashboard for error rate changes
+
+  change-management: |
+    CHANGE MANAGEMENT PROCESS
+    =========================
+    1. All changes MUST be submitted as Pull Requests to the main branch
+    2. PRs require at least one review before merge (GitHub branch protection)
+    3. GitHub Actions runs CI checks (build, push) on every PR
+    4. ArgoCD syncs ONLY from the main branch
+    5. Emergency hotfixes follow the same PR process with expedited review

@@ -2,13 +2,16 @@
 
 **Name:** Muhammad Rasikh Riaz  
 **Email:** mo.rasikh11@gmail.com  
+**Diploma:** EduQual Level 5 Diploma in DevSysOps Engineering  
 **GitHub:** [rasikhriaz/platform-cloud-native-application-development](https://github.com/rasikhriaz/platform-cloud-native-application-development)
 
 ---
 
 ## Project Overview
 
-This project demonstrates a complete cloud-native platform engineering solution built using open-source technologies. The platform supports the full lifecycle of a cloud-native application from source code to automated deployment, auto-scaling, and real-time monitoring running on a production-grade 3-node Kubernetes cluster provisioned on AWS EC2.
+This project demonstrates a complete cloud-native platform engineering solution built using open-source technologies. The platform supports the full lifecycle of a cloud-native application — from source code to automated deployment, auto-scaling, and real-time monitoring — running on a production-grade 3-node Kubernetes cluster provisioned on AWS EC2.
+
+The solution applies platform engineering principles: developers push code to Git, and the platform handles everything else — building, deploying, scaling, monitoring, and self-healing — with zero manual intervention.
 
 ---
 
@@ -22,6 +25,7 @@ This project demonstrates a complete cloud-native platform engineering solution 
 | **Prometheus** | Metrics collection and observability |
 | **Grafana** | Real-time dashboards — CPU, Memory, HTTP Requests |
 | **GitHub Actions** | CI pipeline — build, push, update deployment |
+| **Calico** | CNI plugin with NetworkPolicy enforcement |
 | **AWS EC2** | 3 x t2.medium nodes (1 control-plane + 2 workers) |
 
 ---
@@ -29,7 +33,7 @@ This project demonstrates a complete cloud-native platform engineering solution 
 ## Learning Objectives Covered
 
 | Objective | How it is met |
-|-----------|--------------|
+|-----------|---------------|
 | **A** Develop platforms for deploying cloud-native apps | ArgoCD GitOps pipeline auto-deploys from GitHub to Kubernetes |
 | **B** Use Kubernetes and Docker to orchestrate containers | Kubernetes Deployment with 2 replicas, health probes, NodePort service |
 | **C** Optimize for scalability and resource efficiency | HPA auto-scales pods 2 → 5 based on CPU, Prometheus monitors performance |
@@ -37,74 +41,74 @@ This project demonstrates a complete cloud-native platform engineering solution 
 ---
 
 ## Repository Structure
+
+```
 platform-cloud-native-application-development/
-<pre><span style="background-color:#D0CFCC"><font color="#171421">├── .github/</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   └── workflows/</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│       └── app-build.yml          # CI — build, push, update deployment</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">├── app/</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   ├── index.js                   # Node.js app with /metrics and /health</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   └── index.html                 # IronVeil Defense landing page</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">├── docker/</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   └── Dockerfile                 # Container image definition</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">├── kubernetes/</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   ├── base/</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── namespace.yaml         # platform-demo namespace</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── deployment.yml         # 2 replicas + health probes</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── service.yaml           # NodePort — port 80 → 3000</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── hpa.yml                # Auto-scale 2 → 5 pods at 50% CPU</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   │   ├── metrics-server.yaml    # Metrics Server for HPA CPU signal</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   │   └── rbac.yaml              # Role + RoleBinding for platform-demo</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│   └── argocd/</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">│       └── application.yml        # ArgoCD app pointing to this repo</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">└── monitoring/</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">├── prometheus.yml              # ConfigMap + Deployment + Service</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">├── grafana.yaml                # Deployment + Service</font></span>
-<span style="background-color:#D0CFCC"><font color="#171421">└── service-account.yml        # ClusterRole + ClusterRoleBinding for Prometheus</font></span>
-
-
-</pre>
-
----
-
-## Infrastructure
-
-- **Cloud:** AWS EC2
-- **Instance type:** t2.medium (2 vCPU, 4 GB RAM)
-- **OS:** Ubuntu 24.04 LTS
-- **Cluster setup:** kubeadm
-- **Kubernetes version:** v1.33.0
-- **Nodes:**
-NAME            STATUS   ROLES           AGE   VERSION
-control-plane   Ready    control-plane   15h   v1.33.0
-worker1         Ready    <none>          14h   v1.33.0
-worker2         Ready    <none>          14h   v1.33.0
+├── .github/
+│   └── workflows/
+│       └── app-build.yml              # CI — build, push, update deployment
+├── app/
+│   ├── index.js                       # Node.js app with /metrics and /health
+│   └── index.html                     # IronVeil Defense landing page
+├── docker/
+│   └── Dockerfile                     # Container image definition
+├── kubernetes/
+│   ├── base/
+│   │   ├── namespace.yaml             # platform-demo namespace
+│   │   ├── deployment.yml             # 2 replicas + health probes
+│   │   ├── service.yaml               # NodePort — port 80 → 3000
+│   │   ├── hpa.yml                    # Auto-scale 2 → 5 pods at 50% CPU
+│   │   ├── metrics-server.yaml        # Metrics Server for HPA CPU signal
+│   │   └── rbac.yaml                  # Role + RoleBinding for platform-demo
+│   ├── argocd/
+│   │   └── application.yml            # ArgoCD app pointing to this repo
+│   └── policies/
+│       ├── network-policy.yaml        # Ingress/egress traffic restrictions
+│       ├── pod-disruption-budget.yaml # Availability during maintenance
+│       ├── resource-quota.yaml        # Namespace resource limits + LimitRange
+│       └── image-policy.yaml          # Image approval policy + rollback procedure
+├── monitoring/
+│   ├── prometheus.yml                 # ConfigMap + Deployment + Service
+│   ├── grafana.yaml                   # Deployment + Service
+│   └── service-account.yml            # ClusterRole + ClusterRoleBinding for Prometheus
+└── docs/
+    ├── TRADE-OFF-ANALYSIS.md          # HPA vs VPA, GitOps vs CI/CD, kubeadm vs EKS
+    ├── FAILURE-RECOVERY-RUNBOOK.md    # 7 failure scenarios with recovery steps
+    └── PLATFORM-GOVERNANCE.md         # Deployment, rollback, RBAC, and compliance policies
+```
 
 ---
 
 ## Platform Architecture
+
+```
 Developer
-│
-│  git push
-▼
+    │
+    │  git push
+    ▼
 GitHub Repository
-│
-├──► GitHub Actions
-│         │
-│         ├── Build Docker image
-│         ├── Push rasikh11/cloud-native-app:<commit-sha>
-│         └── Update image tag in deployment.yml
-│
-└──► ArgoCD (watches repo)
-│
-│  auto-sync
-▼
-Kubernetes Cluster  [namespace: platform-demo]
-│
-├── Deployment (2 replicas)
-├── Service (NodePort)
-├── HPA ◄── Metrics Server (CPU signal)
-│
-└── Prometheus ──► Grafana
+    │
+    ├──► GitHub Actions
+    │       │
+    │       ├── Build Docker image
+    │       ├── Push rasikh11/cloud-native-app:<sha>
+    │       └── Update image tag in deployment.yml
+    │
+    └──► ArgoCD (watches repo)
+            │
+            │  auto-sync
+            ▼
+    Kubernetes Cluster [namespace: platform-demo]
+            │
+            ├── Deployment (2 replicas, health probes)
+            ├── Service (NodePort :30080)
+            ├── HPA ◄── Metrics Server (CPU signal)
+            ├── NetworkPolicy (traffic restrictions)
+            ├── ResourceQuota (namespace limits)
+            ├── PodDisruptionBudget (availability guarantee)
+            │
+            └── Prometheus ──► Grafana (dashboards)
+```
 
 ---
 
@@ -120,33 +124,36 @@ A lightweight Node.js HTTP server exposing three endpoints:
 
 ---
 
-## CI/CD Pipeline GitHub Actions + ArgoCD
+## CI/CD Pipeline — GitHub Actions + ArgoCD
 
 ### How it works
+
+```
 Developer git push
-│
-▼
+        │
+        ▼
 GitHub Actions triggered
-│
-├── Build Docker image
-├── Push rasikh11/cloud-native-app:<commit-sha> to Docker Hub
-└── Update image tag in kubernetes/base/deployment.yml
-│
-▼
+        │
+        ├── Build Docker image
+        ├── Push rasikh11/cloud-native-app:<sha> to Docker Hub
+        └── Update image tag in kubernetes/base/deployment.yml
+        │
+        ▼
 ArgoCD detects change in GitHub repo
-│
-▼
+        │
+        ▼
 Auto-syncs new deployment to Kubernetes cluster
-│
-▼
-Pods rolling updated zero downtime
+        │
+        ▼
+Pods rolling updated — zero downtime
+```
 
 ### Key GitOps principles applied
 
-- **Git is the single source of truth** every cluster change goes through GitHub
-- **Auto-sync enabled** ArgoCD applies changes within 3 minutes of a push
-- **Self-heal enabled** ArgoCD corrects any manual changes made directly to the cluster
-- **Drift detection** ArgoCD alerts if cluster state differs from repo state
+- **Git is the single source of truth** — every cluster change goes through GitHub
+- **Auto-sync enabled** — ArgoCD applies changes within 3 minutes of a push
+- **Self-heal enabled** — ArgoCD corrects any manual changes made directly to the cluster
+- **Drift detection** — ArgoCD alerts if cluster state differs from repo state
 
 ### ArgoCD sync policy
 
@@ -161,9 +168,9 @@ syncPolicy:
 
 ---
 
-## Kubernetes Setup kubeadm
+## Kubernetes Setup — kubeadm
 
-### Step 1 Run on ALL 3 nodes
+### Step 1 — Run on ALL 3 nodes
 
 ```bash
 # Disable swap
@@ -183,7 +190,7 @@ apt-get install -y kubelet=1.29.0-1.1 kubeadm=1.29.0-1.1 kubectl=1.29.0-1.1
 apt-mark hold kubelet kubeadm kubectl
 ```
 
-### Step 2 Run on MASTER only
+### Step 2 — Run on MASTER only
 
 ```bash
 kubeadm init \
@@ -204,10 +211,9 @@ kubectl patch deployment metrics-server -n kube-system \
   -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 ```
 
-### Step 3 Run on WORKER nodes
+### Step 3 — Run on WORKER nodes
 
 ```bash
-# Use the join command printed after kubeadm init
 kubeadm join <MASTER_IP>:6443 \
   --token <token> \
   --discovery-token-ca-cert-hash sha256:<hash>
@@ -226,6 +232,12 @@ kubectl apply -f kubernetes/base/rbac.yaml
 kubectl apply -f kubernetes/base/deployment.yml
 kubectl apply -f kubernetes/base/service.yaml
 kubectl apply -f kubernetes/base/hpa.yml
+
+# Apply governance policies
+kubectl apply -f kubernetes/policies/network-policy.yaml
+kubectl apply -f kubernetes/policies/pod-disruption-budget.yaml
+kubectl apply -f kubernetes/policies/resource-quota.yaml
+kubectl apply -f kubernetes/policies/image-policy.yaml
 
 # Verify everything is running
 kubectl get all -n platform-demo
@@ -280,7 +292,7 @@ Access Grafana UI: `http://YOUR_NODE_IP:30030` — Username: `admin` | Password:
 
 1. Go to **Connections → Data Sources → Add data source → Prometheus**
 2. Set URL to: `http://prometheus.platform-demo.svc.cluster.local:9090`
-3. Click **Save & Test** should show green tick
+3. Click **Save & Test** — should show green tick
 
 ### Dashboard Panels
 
@@ -297,17 +309,17 @@ Access Grafana UI: `http://YOUR_NODE_IP:30030` — Username: `admin` | Password:
 
 Open three terminals:
 
-**Terminal 1 Watch HPA:**
+**Terminal 1 — Watch HPA:**
 ```bash
 watch kubectl get hpa -n platform-demo
 ```
 
-**Terminal 2 Watch pods:**
+**Terminal 2 — Watch pods:**
 ```bash
 watch kubectl get pods -n platform-demo
 ```
 
-**Terminal 3 Run load generator:**
+**Terminal 3 — Run load generator:**
 ```bash
 kubectl run load-generator \
   --image=busybox \
@@ -317,10 +329,13 @@ kubectl run load-generator \
 ```
 
 ### Expected scaling behaviour
-CPU: 12%  →  pods: 2   (baseline)
-CPU: 62%  →  pods: 3   (HPA triggers)
-CPU: 81%  →  pods: 4   (scaling up)
-CPU: 48%  →  pods: 5   (max replicas)
+
+```
+CPU: 12%  → pods: 2  (baseline)
+CPU: 62%  → pods: 3  (HPA triggers)
+CPU: 81%  → pods: 4  (scaling up)
+CPU: 48%  → pods: 5  (max replicas)
+```
 
 **Stop load test:**
 ```bash
@@ -328,10 +343,56 @@ kubectl delete pod load-generator -n platform-demo
 # Pods scale back to 2 after ~5 minutes
 ```
 
-**Check HPA events:**
-```bash
-kubectl describe hpa platform-demo-hpa -n platform-demo
-```
+---
+
+## Security and Governance
+
+This platform implements multiple layers of security and governance:
+
+| Layer | Mechanism | File |
+|-------|-----------|------|
+| **Network Security** | NetworkPolicies restrict pod-to-pod traffic | `kubernetes/policies/network-policy.yaml` |
+| **Resource Governance** | ResourceQuota + LimitRange cap namespace usage | `kubernetes/policies/resource-quota.yaml` |
+| **Availability** | PodDisruptionBudget ensures uptime during maintenance | `kubernetes/policies/pod-disruption-budget.yaml` |
+| **Image Policy** | Only tagged images from trusted registry allowed | `kubernetes/policies/image-policy.yaml` |
+| **Access Control** | RBAC with least-privilege ServiceAccount | `kubernetes/base/rbac.yaml` |
+| **Change Management** | All changes via Git PR → ArgoCD auto-sync | `.github/workflows/app-build.yml` |
+| **Audit Trail** | Git commit history = full audit log | GitHub repository |
+
+For detailed policies, see [docs/PLATFORM-GOVERNANCE.md](docs/PLATFORM-GOVERNANCE.md).
+
+---
+
+## Trade-Off Analysis
+
+Key architectural decisions with justification (required for RQF Level 5):
+
+| Decision | Chosen | Alternative | Rationale |
+|----------|--------|-------------|-----------|
+| Autoscaling | HPA | VPA | Stateless app benefits from horizontal scaling; VPA requires pod restarts |
+| Deployment | GitOps (ArgoCD) | Traditional CI/CD | Git as single source of truth, drift detection, self-healing |
+| Cluster management | kubeadm | Managed K8s (EKS) | Demonstrates deeper K8s understanding for assessment; EKS better for production |
+| Monitoring | Prometheus + Grafana | CloudWatch | Open-source, K8s-native, full control over queries and dashboards |
+| CNI plugin | Calico | Flannel | NetworkPolicy support required for security; Flannel has none |
+| Service exposure | NodePort | Ingress / LoadBalancer | Sufficient for demo; Ingress with ALB recommended for production |
+
+Full analysis: [docs/TRADE-OFF-ANALYSIS.md](docs/TRADE-OFF-ANALYSIS.md)
+
+---
+
+## Failure Recovery
+
+Seven failure scenarios are documented with detection, recovery steps, and prevention:
+
+1. Pod crash / OOMKilled
+2. Worker node failure
+3. Control plane failure
+4. ArgoCD connectivity loss
+5. HPA not scaling
+6. Prometheus targets down
+7. Network partition between nodes
+
+Full runbook: [docs/FAILURE-RECOVERY-RUNBOOK.md](docs/FAILURE-RECOVERY-RUNBOOK.md)
 
 ---
 
@@ -406,3 +467,5 @@ kubectl rollout restart deployment/prometheus -n platform-demo
 - [Grafana Documentation](https://grafana.com/docs/)
 - [Docker Documentation](https://docs.docker.com/)
 - [kubeadm Setup Guide](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/)
+- [Calico NetworkPolicy Guide](https://docs.tigera.io/calico/latest/network-policy/)
+- [Kubernetes HPA Documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)

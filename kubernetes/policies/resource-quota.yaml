@@ -1,0 +1,60 @@
+# Resource Quota for platform-demo namespace
+# Purpose: Prevent resource exhaustion by setting hard limits on what this namespace can consume.
+#
+# Governance rationale:
+#   - Limits total CPU and memory the namespace can request
+#   - Caps the number of pods, services, and configmaps
+#   - Forces every pod to declare resource requests/limits (via LimitRange below)
+#   - Prevents a single team or app from starving other workloads on shared clusters
+#
+# These values are sized for a 3-node t2.medium cluster (2 vCPU, 4 GB each = 6 vCPU, 12 GB total)
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: platform-demo-quota
+  namespace: platform-demo
+  labels:
+    app: platform-demo
+    policy: governance
+spec:
+  hard:
+    requests.cpu: "3"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 6Gi
+    pods: "15"
+    services: "10"
+    configmaps: "10"
+    persistentvolumeclaims: "5"
+
+---
+# Limit Range - sets default resource requests/limits for pods that don't specify them
+# Purpose: Ensures no pod runs without resource constraints, which would bypass the quota
+#
+# Policy: Every container gets at least 50m CPU / 64Mi memory
+#         and is capped at 500m CPU / 512Mi memory by default
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: platform-demo-limits
+  namespace: platform-demo
+  labels:
+    app: platform-demo
+    policy: governance
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: 250m
+        memory: 256Mi
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      min:
+        cpu: 50m
+        memory: 64Mi
+      max:
+        cpu: 500m
+        memory: 512Mi
