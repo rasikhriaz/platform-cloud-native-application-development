@@ -23,6 +23,7 @@ spec:
         image: registry.k8s.io/metrics-server/metrics-server:v0.7.1
         args:
         - --kubelet-insecure-tls
+        - --kubelet-preferred-address-types=InternalIP
         - --cert-dir=/tmp
         - --secure-port=4443
         ports:
