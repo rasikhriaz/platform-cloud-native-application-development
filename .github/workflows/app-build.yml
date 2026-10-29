@@ -35,7 +35,6 @@ jobs:
           push: true
           tags: |
             rasikh11/cloud-native-app:${{ steps.tag.outputs.IMAGE_TAG }}
-            rasikh11/cloud-native-app:latest
 
       - name: Update image tag in deployment.yml
         run: |

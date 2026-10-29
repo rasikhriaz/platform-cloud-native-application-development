@@ -15,14 +15,17 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: grafana/grafana:latest
+          image: grafana/grafana:10.4.0
           ports:
             - containerPort: 3000
           env:
             - name: GF_SECURITY_ADMIN_USER
               value: "admin"
             - name: GF_SECURITY_ADMIN_PASSWORD
-              value: "admin123"
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-credentials
+                  key: admin-password
             - name: GF_USERS_ALLOW_SIGN_UP
               value: "false"
           resources:
@@ -44,6 +47,23 @@ spec:
               port: 3000
             initialDelaySeconds: 30
             periodSeconds: 30
+          volumeMounts:
+            - name: datasource
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: dashboard-provider
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: dashboard-json
+              mountPath: /var/lib/grafana/dashboards
+      volumes:
+        - name: datasource
+          configMap:
+            name: grafana-datasource
+        - name: dashboard-provider
+          configMap:
+            name: grafana-dashboard-provider
+        - name: dashboard-json
+          configMap:
+            name: grafana-dashboard-json
 ---
 apiVersion: v1
 kind: Service
@@ -58,3 +78,16 @@ spec:
     - port: 3000
       targetPort: 3000
       nodePort: 30030
+---
+# Grafana credentials secret
+# In production, this would come from a secrets manager (e.g., AWS Secrets Manager + ExternalSecrets)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-credentials
+  namespace: platform-demo
+  labels:
+    app: grafana
+type: Opaque
+stringData:
+  admin-password: "admin123"
